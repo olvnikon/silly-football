@@ -48,11 +48,11 @@ function shuffleArray(array) {
 function getCardBackground(type) {
   switch (type) {
     case "bonus":
-      return "url('/assets/bonus.png')";
+      return "url('https://olvnikon.github.io/silly-football/dist/assets/bonus.png')";
     case "penalty":
-      return "url('/assets/penalty.png')";
+      return "url('https://olvnikon.github.io/silly-football/dist/assets/penalty.png')";
     default:
-      return "url('/assets/neutral.png')";
+      return "url('https://olvnikon.github.io/silly-football/dist/assets/neutral.png')";
   }
 }
 
@@ -170,7 +170,7 @@ const styles = {
   fullScreen: {
     height: "100vh",
     width: "100vw",
-    backgroundImage: "url('/assets/background.png')",
+    backgroundImage: "url('https://olvnikon.github.io/silly-football/dist/assets/background.png')",
     backgroundSize: "cover",
     display: "flex",
     justifyContent: "center",
