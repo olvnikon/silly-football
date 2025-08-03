@@ -1,12 +1,4 @@
-import { useState } from "react";
-
-/**
- * Random Card Selection App – one–file implementation
- * Assumptions
- *  - All image files (background.png, bonus.png, penalty.png, neutral.png) are placed in the public folder so that
- *    they can be reached by plain URL references, e.g. "/background.png".
- *  - No external libraries are required – only React is used.
- */
+import { useState, useEffect } from "react";
 
 // ----- Card Data -----------------------------------------------------------
 
@@ -25,7 +17,7 @@ const SNIPER_CARDS = [
 const GOALKEEPER_CARDS = [
   { type: "bonus", text: "Goalie Charge: You can freely run forward to defend!" },
   { type: "bonus", text: "Long Shot: Shooter moves two large steps back from the spot!" },
-  { type: "bonus", text: "Double Defense: Another player joins to help you defend!" },
+  { type: "bonus", text: "Smaller Ball: Shooter must use a smaller ball!" },
   { type: "bonus", text: "Angled Shot: Sniper must shoot from a difficult angle (side)!" },
   { type: "penalty", text: "Oversized Keeper: Wear oversized clothing while defending!" },
   { type: "penalty", text: "One-Eyed Keeper: Cover one eye during your defense!" },
@@ -36,6 +28,27 @@ const GOALKEEPER_CARDS = [
 
 // ----- Helper Functions ----------------------------------------------------
 
+const IMAGE_URLS = {
+  background: "https://olvnikon.github.io/silly-football/dist/assets/background.png",
+  bonus: "https://olvnikon.github.io/silly-football/dist/assets/bonus.png",
+  penalty: "https://olvnikon.github.io/silly-football/dist/assets/penalty.png",
+  neutral: "https://olvnikon.github.io/silly-football/dist/assets/neutral.png"
+};
+
+function preloadImages() {
+  Object.values(IMAGE_URLS).forEach(src => {
+    const img = new Image();
+    img.src = src;
+  });
+}
+
+function getCardBackground(type) {
+  const key = type === "penalty" ? "penalty"
+            : type === "bonus"   ? "bonus"
+            : "neutral";
+  return `url('${IMAGE_URLS[key]}')`;
+}
+
 function shuffleArray(array) {
   const copy = [...array];
   for (let i = copy.length - 1; i > 0; i -= 1) {
@@ -43,17 +56,6 @@ function shuffleArray(array) {
     [copy[i], copy[j]] = [copy[j], copy[i]];
   }
   return copy;
-}
-
-function getCardBackground(type) {
-  switch (type) {
-    case "bonus":
-      return "url('https://olvnikon.github.io/silly-football/dist/assets/bonus.png')";
-    case "penalty":
-      return "url('https://olvnikon.github.io/silly-football/dist/assets/penalty.png')";
-    default:
-      return "url('https://olvnikon.github.io/silly-football/dist/assets/neutral.png')";
-  }
 }
 
 // ----- Main Component ------------------------------------------------------
@@ -71,8 +73,12 @@ export function App() {
   const [sniperPick, setSniperPick] = useState(null);
   const [keeperPick, setKeeperPick] = useState(null);
 
-  // --- Event Handlers ------------------------------------------------------
+  // Preload all images on mount
+  useEffect(preloadImages, []);
 
+
+  // --- Event Handlers ------------------------------------------------------
+  
   function startGame() {
     setSniperDeck(shuffleArray(SNIPER_CARDS));
     setKeeperDeck(shuffleArray(GOALKEEPER_CARDS));
@@ -99,6 +105,17 @@ export function App() {
     setSniperPick(null);
     setKeeperPick(null);
     setRound(r => r + 1);
+  }
+
+  function enableFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+      el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+    }
   }
 
   // --- Rendering helpers ---------------------------------------------------
@@ -158,7 +175,7 @@ export function App() {
   }
 
   return (
-    <div style={styles.fullScreen}>
+    <div style={styles.fullScreen} onClick={enableFullscreen}>
       {view === "start" ? renderStartScreen() : renderGameScreen()}
     </div>
   );
@@ -170,7 +187,7 @@ const styles = {
   fullScreen: {
     height: "100vh",
     width: "100vw",
-    backgroundImage: "url('https://olvnikon.github.io/silly-football/dist/assets/background.png')",
+    backgroundImage: `url('${IMAGE_URLS.background}')`,
     backgroundSize: "cover",
     display: "flex",
     justifyContent: "center",
